@@ -15,7 +15,7 @@ dependencies {
   testImplementation 'junit:junit:4.13.1'
 }
 
-mainClassName = "com.example.AkkaQuickstart"
+mainClassName = "com.example.iot.IotMain"
 
 run {
   standardInput = System.in
