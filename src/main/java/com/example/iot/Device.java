@@ -16,8 +16,11 @@ public class Device extends AbstractBehavior<Device.Command> {
 	private final String deviceId;
 	private Optional<Double> lastTemperatureReading = Optional.empty();
 
-	
 	public interface Command {}
+
+	static enum Passivate implements Command {
+		INSTANCE
+	}
 
 	// readTemp request
 	public static final class ReadTemperature implements Command {
@@ -88,6 +91,7 @@ public class Device extends AbstractBehavior<Device.Command> {
 		return newReceiveBuilder()
 			.onMessage(ReadTemperature.class, this::onReadTemperature)
 			.onMessage(RecordTemperature.class, this::onRecordTemperature)
+			.onMessage(Passivate.class, m -> Behaviors.stopped())
 			.onSignal(PostStop.class, signal -> onPostStop())
 			.build();
 	}
