@@ -2,8 +2,6 @@ package com.example.iot;
 
 import java.util.Optional;
 
-import com.example.iot.Device.RespondTemperature.TemperatureRecorded;
-
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;

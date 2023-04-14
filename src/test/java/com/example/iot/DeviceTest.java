@@ -15,7 +15,6 @@ public class DeviceTest {
 
 	@ClassRule public static final TestKitJunitResource testKit = new TestKitJunitResource();
 
-
 	@Test
 	public void testReplyWithEmptyReadingIfNoTemperatureIsKnown() {
 		TestProbe<Device.RespondTemperature> probe = testKit.createTestProbe(Device.RespondTemperature.class);
