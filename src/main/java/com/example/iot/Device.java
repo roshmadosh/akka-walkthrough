@@ -37,10 +37,12 @@ public class Device extends AbstractBehavior<Device.Command> {
 	// readTemp response
 	public static final class RespondTemperature {
 		final long requestId;
+		final String deviceId;
 		final Optional<Double> value;
 
-		public RespondTemperature(long requestId, Optional<Double> value) {
+		public RespondTemperature(long requestId, String deviceId, Optional<Double> value) {
 			this.requestId = requestId;
+			this.deviceId = deviceId;
 			this.value = value;
 
 		}	
@@ -104,7 +106,7 @@ public class Device extends AbstractBehavior<Device.Command> {
 	}
 
 	private Behavior<Command> onReadTemperature(ReadTemperature r) {
-		r.replyTo.tell(new RespondTemperature(r.requestId, lastTemperatureReading));
+		r.replyTo.tell(new RespondTemperature(r.requestId, deviceId, lastTemperatureReading));
 		return this;	
 	}
 

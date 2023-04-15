@@ -86,6 +86,49 @@ public class DeviceManager extends AbstractBehavior<DeviceManager.Command> {
 		}
 	}
 
+	public static final class RequestAllTemperatures implements DeviceGroup.Command, DeviceGroupQuery.Command, Command {
+		final long requestId;
+		final String groupId;
+		final ActorRef<RespondAllTemperatures> replyTo;
+
+		public RequestAllTemperatures(long requestId, String groupId, ActorRef<RespondAllTemperatures> replyTo) {
+			this.requestId = requestId;
+			this.groupId = groupId;
+			this.replyTo = replyTo;
+		}
+	}
+	public static final class RespondAllTemperatures {
+		final long requestId;
+		final Map<String, TemperatureReading> temperatures;
+
+		public RespondAllTemperatures(long requestId, Map<String, TemperatureReading> temperatures) {
+			this.requestId = requestId;
+			this.temperatures = temperatures;
+		}
+	}
+
+	public interface TemperatureReading {}
+	
+
+	public static final class Temperature implements TemperatureReading {
+		public final double value;
+
+		public Temperature(double value) {
+			this.value = value;
+		}
+	}
+
+	public enum TemperatureNotAvailable implements TemperatureReading {
+		INSTANCE
+	}
+
+	public enum DeviceNotAvailable implements TemperatureReading {
+		INSTANCE
+	}
+	public enum DeviceTimedOut implements TemperatureReading {
+		INSTANCE
+	}
+
 	// ---
 
 	@Override
