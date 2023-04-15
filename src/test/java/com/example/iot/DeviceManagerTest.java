@@ -2,10 +2,12 @@ package com.example.iot;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.example.iot.DeviceManager.*;
+
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +19,6 @@ import akka.actor.typed.ActorRef;
 public class DeviceManagerTest {
 
 	@ClassRule public static final TestKitJunitResource testKit = new TestKitJunitResource();
-
 
 	@Test
 	public void testReplyToRegistrationRequests() {
@@ -38,6 +39,33 @@ public class DeviceManagerTest {
 
 		assertNotEquals(registered1.device, registered2.device);
 		assertEquals(registered1.device, registered3.device);
+	}
+
+	@Test
+	public void testListActiveDeviceGroups() {
+		final String GROUP_NAME = "group1";
+		final String DEVICE_NAME = "device1";
+		
+		TestProbe<DeviceRegistered> registeredProbe = testKit.createTestProbe(DeviceRegistered.class);
+		ActorRef<DeviceManager.Command> managerActor = testKit.spawn(DeviceManager.create());
+
+		managerActor.tell(new RequestTrackDevice(GROUP_NAME, DEVICE_NAME, registeredProbe.getRef()));
+		registeredProbe.receiveMessage();
+
+		TestProbe<ReplyDeviceList> deviceGroupListProbe = testKit.createTestProbe(ReplyDeviceList.class);
+		// request device list for valid group name
+		managerActor.tell(new RequestDeviceList(0L, GROUP_NAME, deviceGroupListProbe.getRef()));	
+		ReplyDeviceList reply = deviceGroupListProbe.receiveMessage();
+
+		// do the same for invalid group name
+		managerActor.tell(new RequestDeviceList(1L, "bad name", deviceGroupListProbe.getRef()));	
+		ReplyDeviceList badReply = deviceGroupListProbe.receiveMessage();
+
+		assertEquals(0L, reply.requestId);
+		assertEquals(Stream.of(DEVICE_NAME).collect(Collectors.toSet()), reply.ids);
+
+		assertEquals(1L, badReply.requestId);
+		assertEquals(Collections.emptySet(), badReply.ids);
 	}
 
 	@Test
@@ -96,4 +124,5 @@ public class DeviceManagerTest {
 					return null;
 				});
 	}
+
 }

@@ -31,12 +31,10 @@ public class DeviceGroup extends AbstractBehavior<DeviceGroup.Command> {
 	}
 
 	private class DeviceTerminated implements Command {
-    public final ActorRef<Device.Command> device;
     public final String groupId;
     public final String deviceId;
 
-    DeviceTerminated(ActorRef<Device.Command> device, String groupId, String deviceId) {
-      this.device = device;
+    DeviceTerminated(String groupId, String deviceId) {
       this.groupId = groupId;
       this.deviceId = deviceId;
     }
@@ -58,7 +56,7 @@ public class DeviceGroup extends AbstractBehavior<DeviceGroup.Command> {
 				getContext().getLog().info("Creating actor for device {}", trackMessage.deviceId);
 				deviceRef = getContext().spawn(Device.create(trackMessage.groupId, trackMessage.deviceId), "device-" + trackMessage.deviceId);
 
-				getContext().watchWith(deviceRef, new DeviceTerminated(deviceRef, groupId, trackMessage.deviceId));
+				getContext().watchWith(deviceRef, new DeviceTerminated(groupId, trackMessage.deviceId));
 			}
 
 
