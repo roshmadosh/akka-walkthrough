@@ -1,8 +1,10 @@
 package com.example.iot;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.iot.DeviceManager.RequestAllTemperatures;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
@@ -46,6 +48,7 @@ public class DeviceGroup extends AbstractBehavior<DeviceGroup.Command> {
 			.onMessage(DeviceManager.RequestTrackDevice.class, this::onTrackDevice)
 			.onMessage(DeviceManager.RequestDeviceList.class, r -> r.groupId.equals(groupId), this::onDeviceList)
 			.onMessage(DeviceTerminated.class, this::onTerminated)
+			.onMessage(DeviceManager.RequestAllTemperatures.class, r -> r.groupId.equals(groupId), this::onAllTemperatures)
 			.build();
 	}
 
@@ -73,6 +76,19 @@ public class DeviceGroup extends AbstractBehavior<DeviceGroup.Command> {
 
 	private DeviceGroup onDeviceList(DeviceManager.RequestDeviceList request) {
 		request.replyTo.tell(new DeviceManager.ReplyDeviceList(request.requestId, deviceIdToActor.keySet()));
+		return this;
+	}
+
+	private DeviceGroup onAllTemperatures(RequestAllTemperatures r) {
+		Map<String, ActorRef<Device.Command>> copyMap = new HashMap<>(this.deviceIdToActor);
+
+		getContext().spawnAnonymous(new DeviceGroupQuery.Builder()
+				.deviceIdToActor(copyMap)
+				.requestId(r.requestId)
+				.requester(r.replyTo)
+				.timeout(Duration.ofSeconds(3))
+				.build());
+
 		return this;
 	}
 
