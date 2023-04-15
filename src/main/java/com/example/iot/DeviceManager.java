@@ -13,7 +13,6 @@ import java.util.Set;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.PostStop;
-import scala.collection.immutable.ArraySeq.ofInt;
 
 public class DeviceManager extends AbstractBehavior<DeviceManager.Command> {
 
@@ -115,6 +114,27 @@ public class DeviceManager extends AbstractBehavior<DeviceManager.Command> {
 
 		public Temperature(double value) {
 			this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			Temperature that = (Temperature) o;
+
+			return Double.compare(that.value, value) == 0;
+		}
+
+		@Override
+		public int hashCode() {
+			long temp = Double.doubleToLongBits(value);
+			return (int) (temp ^ (temp >>> 32));
+		}
+
+		@Override
+		public String toString() {
+			return "Temperature{" + "value=" + value + '}';
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.example.iot;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +62,8 @@ public class DeviceGroupQuery extends AbstractBehavior<DeviceGroupQuery.Command>
 		super(context);
 		this.requestId = builder.requestId;
 		this.requester = builder.requester;
-	
+		this.repliesSoFar = new HashMap<>();	
+
 		timers.startSingleTimer(CollectionTimeout.INSTANCE, builder.timeout);
 
 		ActorRef<Device.RespondTemperature> respondTemperatureAdapter = context.messageAdapter(Device.RespondTemperature.class, 
